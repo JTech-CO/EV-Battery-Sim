@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "https://github.com/JTech-CO/EV-Battery-Research/",
+  "licenseNote": "About:Energy-derived parameter subsets are CC BY-SA 4.0. See THIRD_PARTY_NOTICES.md.",
+  "cells": [
+    {
+      "id": "ae-nmc111-pouch-12p5ah",
+      "name": "About:Energy NMC111 / Graphite 12.5 Ah Pouch",
+      "shortName": "NMC111 12.5 Ah",
+      "format": "pouch",
+      "chemistry": {"positive": "NMC111", "negative": "graphite"},
+      "capacityAh": 12.5,
+      "bpxVersion": "0.1",
+      "referenceTemperatureK": 298.15,
+      "lowerVoltageV": 2.7,
+      "upperVoltageV": 4.2,
+      "specificHeatJkgK": 913,
+      "thermalConductivityWmK": 2.04,
+      "densityKgM3": 1847,
+      "externalSurfaceAreaM2": 0.0379,
+      "volumeM3": 0.000128,
+      "electrodeAreaM2": 0.016808,
+      "electrodePairsParallel": 34,
+      "electrolyte": {"initialConcentrationMolM3": 1000, "cationTransferenceNumber": 0.2594},
+      "negative": {
+        "ocpModel": "ae_nmc_negative",
+        "entropicModel": "ae_graphite_entropic",
+        "particleRadiusM": 4.12e-6,
+        "thicknessM": 5.62e-5,
+        "diffusivityM2s": 2.728e-14,
+        "porosity": 0.253991,
+        "transportEfficiency": 0.128,
+        "reactionRateConstantMolM2s": 5.199e-6,
+        "stoichMin": 0.005504,
+        "stoichMax": 0.75668,
+        "maxConcentrationMolM3": 29730
+      },
+      "positive": {
+        "ocpModel": "ae_nmc_positive",
+        "entropicModel": "ae_nmc_positive_entropic",
+        "particleRadiusM": 4.6e-6,
+        "thicknessM": 5.23e-5,
+        "diffusivityM2s": 3.2e-14,
+        "porosity": 0.277493,
+        "transportEfficiency": 0.1462,
+        "reactionRateConstantMolM2s": 2.305e-5,
+        "stoichMin": 0.42424,
+        "stoichMax": 0.9621,
+        "maxConcentrationMolM3": 46200
+      },
+      "separator": {"thicknessM": 2e-5, "porosity": 0.47, "transportEfficiency": 0.3222},
+      "provenance": {
+        "datasetId": "AE_NMC",
+        "evidenceStatus": "source_reported_mixed_provenance",
+        "source": "About:Energy BPX parameterisation, transcribed/reserialized in EV-Battery-Research",
+        "note": "Cycling + teardown informed; electrolyte/entropic literature values; other thermal properties reported as estimated by source."
+      }
+    },
+    {
+      "id": "ae-lfp-18650-2ah",
+      "name": "About:Energy LFP / Graphite 2 Ah 18650",
+      "shortName": "LFP 2 Ah 18650",
+      "format": "18650 cylindrical",
+      "chemistry": {"positive": "LFP", "negative": "graphite"},
+      "capacityAh": 2,
+      "bpxVersion": "0.1",
+      "referenceTemperatureK": 298.15,
+      "lowerVoltageV": 2.0,
+      "upperVoltageV": 3.65,
+      "specificHeatJkgK": 999,
+      "thermalConductivityWmK": 1.89,
+      "densityKgM3": 1940,
+      "externalSurfaceAreaM2": 0.00431,
+      "volumeM3": 0.000017,
+      "electrodeAreaM2": 0.08959998,
+      "electrodePairsParallel": 1,
+      "electrolyte": {"initialConcentrationMolM3": 1000, "cationTransferenceNumber": 0.259},
+      "negative": {
+        "ocpModel": "ae_lfp_graphite_negative",
+        "entropicModel": "ae_graphite_entropic",
+        "particleRadiusM": 4.8e-6,
+        "thicknessM": 4.44e-5,
+        "diffusivityM2s": 9.6e-15,
+        "porosity": 0.20666,
+        "transportEfficiency": 0.09395,
+        "reactionRateConstantMolM2s": 6.872e-6,
+        "stoichMin": 0.0016261,
+        "stoichMax": 0.82258,
+        "maxConcentrationMolM3": 31400
+      },
+      "positive": {
+        "ocpModel": "ae_lfp_positive",
+        "entropicModel": "ae_lfp_positive_entropic",
+        "particleRadiusM": 5e-7,
+        "thicknessM": 6.43e-5,
+        "diffusivityM2s": 6.873e-17,
+        "porosity": 0.20359,
+        "transportEfficiency": 0.09186,
+        "reactionRateConstantMolM2s": 9.736e-7,
+        "stoichMin": 0.0875,
+        "stoichMax": 0.95038,
+        "maxConcentrationMolM3": 21200
+      },
+      "separator": {"thicknessM": 2e-5, "porosity": 0.47, "transportEfficiency": 0.3222},
+      "provenance": {
+        "datasetId": "AE_LFP",
+        "evidenceStatus": "source_reported_mixed_provenance",
+        "source": "About:Energy BPX parameterisation, transcribed/reserialized in EV-Battery-Research",
+        "note": "Source explicitly notes high-rate/low-SOC discrepancies and limitations of basic Fick/Butler-Volmer representation for LFP."
+      }
+    }
+  ]
+}

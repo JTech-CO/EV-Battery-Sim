@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "warning": "These values are engineering priors for the browser reduced-order model. They are not source-reported BPX measurements and are not validated lifetime parameters.",
+  "priors": {
+    "ae-nmc111-pouch-12p5ah": {
+      "nominalVoltageV": 3.7,
+      "ecm": {"r0Ohm": 0.0022, "r1Ohm": 0.0030, "tau1S": 18, "r2Ohm": 0.0032, "tau2S": 145},
+      "limits": {"maxDischargeC": 3.0, "maxChargeC": 1.5},
+      "temperatureResistanceCoeffPerK": 0.024,
+      "aging": {"damagePerEfc": 0.00008, "temperatureScaleK": 18, "highSocWeight": 0.5, "highCRateWeight": 0.45}
+    },
+    "ae-lfp-18650-2ah": {
+      "nominalVoltageV": 3.2,
+      "ecm": {"r0Ohm": 0.012, "r1Ohm": 0.008, "tau1S": 15, "r2Ohm": 0.006, "tau2S": 110},
+      "limits": {"maxDischargeC": 4.0, "maxChargeC": 2.0},
+      "temperatureResistanceCoeffPerK": 0.022,
+      "aging": {"damagePerEfc": 0.00005, "temperatureScaleK": 20, "highSocWeight": 0.35, "highCRateWeight": 0.4}
+    }
+  }
+}

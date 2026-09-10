@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071017">
+  <meta name="description" content="EV Battery Sim - public-parameter reduced multiphysics EV battery simulation based on EV-Battery-Research.">
+  <title>EV Battery Sim</title>
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+  <noscript><div class="noscript">EV Battery Sim requires JavaScript.</div></noscript>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <div class="eyebrow" data-i18n="researchBased">EV-Battery-Research 기반</div>
+          <h1>EV Battery Sim</h1>
+          <p data-i18n="appSubtitle">공개 파라미터 기반 셀·팩·차량 연성 시뮬레이터</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-badges" aria-label="Model scope">
+          <span class="badge" data-i18n="modelBadge">축약 다중물리 모델</span>
+          <span class="badge muted" data-i18n="dataBadge">BPX 0.1 + EPA US06</span>
+        </div>
+        <a class="icon-link" href="https://github.com/JTech-CO/EV-Battery-Research/" target="_blank" rel="noreferrer" aria-label="Research repository">GitHub</a>
+        <button id="languageButton" class="compact-button" type="button">EN</button>
+      </div>
+    </header>
+
+    <div id="appError" class="error-banner" hidden></div>
+
+    <main class="workspace">
+      <aside class="control-panel" aria-label="Simulation controls">
+        <div class="panel-heading">
+          <div><span class="eyebrow">MODEL INPUT</span><h2 data-i18n="config">시뮬레이션 설정</h2></div>
+          <button id="resetButton" class="text-button" type="button" data-i18n="reset">기본값 복원</button>
+        </div>
+
+        <section class="control-section">
+          <h3><span>01</span><span data-i18n="cellPack">셀 및 팩</span></h3>
+          <label class="field full"><span data-i18n="cellPreset">셀 프리셋</span><select id="cellPreset"></select></label>
+          <div id="cellMeta" class="meta-strip"></div>
+          <div class="field-grid">
+            <label class="field"><span data-i18n="series">직렬 셀 수 (Ns)</span><div class="input-unit"><input id="series" type="number" min="1" max="1000" step="1"><em>s</em></div></label>
+            <label class="field"><span data-i18n="parallel">병렬 셀 수 (Np)</span><div class="input-unit"><input id="parallel" type="number" min="1" max="1000" step="1"><em>p</em></div></label>
+            <label class="field"><span data-i18n="initialSoc">초기 SOC</span><div class="input-unit"><input id="initialSoc" type="number" min="0.1" max="99.9" step="0.1"><em>%</em></div></label>
+            <label class="field"><span data-i18n="initialSoh">초기 SOH</span><div class="input-unit"><input id="initialSoh" type="number" min="50" max="100" step="0.1"><em>%</em></div></label>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <h3><span>02</span><span data-i18n="scenario">시나리오</span></h3>
+          <label class="field full"><span data-i18n="scenarioType">부하 시나리오</span>
+            <select id="scenarioType">
+              <option value="us06" data-i18n="us06">EPA US06 주행 사이클</option>
+              <option value="reference-1c" data-i18n="ref1c">NMC 공개 1C 기준곡선 비교</option>
+              <option value="constant-power" data-i18n="constantPower">일정 팩 전력</option>
+              <option value="constant-current" data-i18n="constantCurrent">일정 셀 C-rate</option>
+            </select>
+          </label>
+          <div class="field-grid">
+            <label class="field" data-scenario="constant-power"><span data-i18n="power">팩 전력</span><div class="input-unit"><input id="powerKW" type="number" step="1"><em>kW</em></div></label>
+            <label class="field" data-scenario="constant-current"><span data-i18n="currentC">셀 C-rate</span><div class="input-unit"><input id="currentC" type="number" step="0.1"><em>C</em></div></label>
+            <label class="field" data-scenario="constant-power constant-current"><span data-i18n="duration">지속 시간</span><div class="input-unit"><input id="durationS" type="number" min="1" step="1"><em>s</em></div></label>
+          </div>
+          <div class="info-note">US06: 601 points · 1 Hz · prescribed vehicle speed, not measured battery current.</div>
+        </section>
+
+        <section class="control-section">
+          <h3><span>03</span><span data-i18n="thermalAging">열 및 열화</span></h3>
+          <div class="field-grid">
+            <label class="field"><span data-i18n="ambient">주변 온도</span><div class="input-unit"><input id="ambientTempC" type="number" step="1"><em>°C</em></div></label>
+            <label class="field"><span data-i18n="initialTemp">초기 셀 온도</span><div class="input-unit"><input id="initialTempC" type="number" step="1"><em>°C</em></div></label>
+            <label class="field full"><span data-i18n="cooling">열전달계수 h</span><div class="input-unit"><input id="coolingH" type="number" min="0" step="1"><em>W/m²K</em></div></label>
+          </div>
+          <label class="switch-row"><input id="agingEnabled" type="checkbox"><span class="switch" aria-hidden="true"></span><span data-i18n="agingToggle">탐색용 열화 prior 적용</span></label>
+          <p class="warning-note" data-i18n="agingWarning">SOH 변화는 공개 열화 데이터에 맞춘 예측이 아니라 screening prior입니다.</p>
+        </section>
+
+        <section id="vehiclePanel" class="control-section">
+          <h3><span>04</span><span data-i18n="vehicle">차량</span></h3>
+          <div class="field-grid">
+            <label class="field"><span data-i18n="mass">차량 질량</span><div class="input-unit"><input id="massKg" type="number" min="100" step="10"><em>kg</em></div></label>
+            <label class="field"><span data-i18n="cd">항력계수 Cd</span><input id="cd" type="number" min="0" step="0.01"></label>
+            <label class="field"><span data-i18n="area">전면적</span><div class="input-unit"><input id="frontalArea" type="number" min="0.1" step="0.1"><em>m²</em></div></label>
+            <label class="field"><span data-i18n="crr">구름저항계수 Crr</span><input id="crr" type="number" min="0" step="0.001"></label>
+            <label class="field"><span data-i18n="driveEff">구동 효율</span><div class="input-unit"><input id="driveEff" type="number" min="1" max="100" step="1"><em>%</em></div></label>
+            <label class="field"><span data-i18n="regenEff">회생 효율</span><div class="input-unit"><input id="regenEff" type="number" min="0" max="100" step="1"><em>%</em></div></label>
+            <label class="field"><span data-i18n="aux">보조 부하</span><div class="input-unit"><input id="auxPower" type="number" min="0" step="0.1"><em>kW</em></div></label>
+            <label class="field"><span data-i18n="grade">도로 경사</span><div class="input-unit"><input id="gradePct" type="number" step="0.1"><em>%</em></div></label>
+            <label class="field"><span data-i18n="maxTraction">최대 구동 전력</span><div class="input-unit"><input id="maxTraction" type="number" min="1" step="10"><em>kW</em></div></label>
+            <label class="field"><span data-i18n="maxRegen">최대 회생 전력</span><div class="input-unit"><input id="maxRegen" type="number" min="0" step="10"><em>kW</em></div></label>
+          </div>
+        </section>
+
+        <button id="runButton" class="run-button" type="button"><span data-i18n="run">시뮬레이션 실행</span><b>→</b></button>
+      </aside>
+
+      <section class="dashboard">
+        <section class="metric-strip" aria-label="Current simulation state">
+          <article><span data-i18n="packVoltage">팩 전압</span><strong id="metricPackVoltage">—</strong></article>
+          <article><span data-i18n="packCurrent">팩 전류</span><strong id="metricPackCurrent">—</strong></article>
+          <article><span data-i18n="soc">SOC</span><strong id="metricSoc">—</strong></article>
+          <article><span data-i18n="cellTemp">셀 온도</span><strong id="metricTemp">—</strong></article>
+          <article><span data-i18n="soh">SOH</span><strong id="metricSoh">—</strong></article>
+          <article><span data-i18n="netEnergy">순 배터리 에너지</span><strong id="metricEnergy">—</strong></article>
+        </section>
+
+        <section class="playback-card card">
+          <div class="playback-controls">
+            <button id="playButton" class="play-button" type="button" data-i18n="playback">재생</button>
+            <input id="timeline" class="timeline" type="range" min="0" max="1" value="0" step="1" aria-label="Simulation time">
+            <strong id="timelineTime">0 / 0 s</strong>
+          </div>
+          <div class="export-actions"><button id="exportCsv" class="secondary-button" type="button" data-i18n="exportCsv">결과 CSV</button><button id="exportJson" class="secondary-button" type="button" data-i18n="exportJson">설정 JSON</button></div>
+        </section>
+
+        <div class="dashboard-grid two-column">
+          <section class="card electro-card">
+            <div class="card-heading"><div><span class="eyebrow">CELL STATE</span><h2 data-i18n="electrochem">전기화학 상태</h2></div><span class="scope-tag source" data-i18n="sourceBased">출처 기반</span></div>
+            <canvas id="cellCanvas" class="cell-canvas" aria-label="Schematic battery cell visualization"></canvas>
+            <p class="schematic-label" data-i18n="schematic">개략도 - 공간 PDE 해석 결과가 아님</p>
+            <div class="state-table">
+              <div><span data-i18n="terminalV">단자 전압</span><strong id="terminalVoltageValue">—</strong></div>
+              <div><span data-i18n="ocv">OCV</span><strong id="ocvValue">—</strong></div>
+              <div><span data-i18n="negOcp">음극 OCP</span><strong id="negativeOcpValue">—</strong></div>
+              <div><span data-i18n="posOcp">양극 OCP</span><strong id="positiveOcpValue">—</strong></div>
+              <div><span data-i18n="xn">음극 stoichiometry</span><strong id="xnValue">—</strong></div>
+              <div><span data-i18n="xp">양극 stoichiometry</span><strong id="xpValue">—</strong></div>
+            </div>
+          </section>
+
+          <section class="card diagnostics-card">
+            <div class="card-heading"><div><span class="eyebrow">DIAGNOSTICS</span><h2 data-i18n="risk">모델 상태 / 위험 지표</h2></div><span class="scope-tag prior" data-i18n="engineeringPrior">엔지니어링 prior</span></div>
+            <div class="diagnostic-list">
+              <div class="diagnostic"><span data-i18n="cRate">C-rate</span><strong id="cRateValue">—</strong><div class="meter"><i style="width:40%"></i></div></div>
+              <div class="diagnostic"><span data-i18n="irrHeat">비가역</span><strong id="irreversibleHeatValue">—</strong></div>
+              <div class="diagnostic"><span data-i18n="revHeat">가역</span><strong id="reversibleHeatValue">—</strong></div>
+              <div class="diagnostic"><span data-i18n="platingRisk">리튬 석출 위험 지수</span><strong id="platingRiskValue">—</strong></div>
+              <div class="diagnostic"><span data-i18n="agingStress">열화 스트레스 지수</span><strong id="agingStressValue">—</strong></div>
+              <div class="diagnostic"><span data-i18n="powerLimited">BMS/모델 전력 제한</span><strong id="powerLimitValue">—</strong></div>
+            </div>
+            <div class="model-chain" aria-label="Reduced model chain">
+              <span>OCP</span><b>→</b><span>2-RC</span><b>→</b><span>Thermal</span><b>→</b><span>Pack</span><b>→</b><span>Vehicle</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="card charts-card">
+          <div class="card-heading"><div><span class="eyebrow">TIME DOMAIN</span><h2 data-i18n="charts">시계열</h2></div></div>
+          <div class="chart-grid">
+            <figure><figcaption data-i18n="speed">차량 속도</figcaption><canvas id="speedChart"></canvas></figure>
+            <figure><figcaption data-i18n="packPower">팩 전력</figcaption><canvas id="powerChart"></canvas></figure>
+            <figure><figcaption data-i18n="voltage">셀 전압</figcaption><canvas id="voltageChart"></canvas></figure>
+            <figure><figcaption data-i18n="socChart">SOC</figcaption><canvas id="socChart"></canvas></figure>
+            <figure><figcaption data-i18n="tempChart">셀 온도</figcaption><canvas id="tempChart"></canvas></figure>
+            <figure><figcaption data-i18n="heatChart">셀 열률</figcaption><canvas id="heatChart"></canvas></figure>
+          </div>
+        </section>
+
+        <div class="dashboard-grid two-column bottom-grid">
+          <section class="card">
+            <div class="card-heading"><div><span class="eyebrow">SUMMARY</span><h2 data-i18n="summary">결과 요약</h2></div></div>
+            <div id="summaryGrid" class="summary-grid"></div>
+            <div id="validationCard" class="validation-box" hidden>
+              <div><span data-i18n="validation">NMC 1C 기준곡선 검증</span><small>About:Energy source curve</small></div>
+              <div><span data-i18n="rmse">전압 RMSE</span><strong id="rmseValue">—</strong></div>
+              <div><span data-i18n="maxError">최대 절대 오차</span><strong id="maxErrorValue">—</strong></div>
+            </div>
+          </section>
+
+          <section class="card provenance-card">
+            <div class="card-heading"><div><span class="eyebrow">PROVENANCE</span><h2 data-i18n="modelScope">모델 범위 및 출처</h2></div></div>
+            <div class="provenance-list">
+              <div><span class="scope-tag source" data-i18n="sourceBased">출처 기반</span><p data-i18n="sourceOcp">OCP·stoichiometry·셀 열용량·전압 한계</p></div>
+              <div><span class="scope-tag prior" data-i18n="engineeringPrior">엔지니어링 prior</span><p data-i18n="priorEcm">2-RC 분극 저항·온도 스케일링·C-rate 한계</p></div>
+              <div><span class="scope-tag source" data-i18n="sourceBased">출처 기반</span><p data-i18n="sourceVehicle">EPA US06 속도 프로파일</p></div>
+              <div><span class="scope-tag prior" data-i18n="engineeringPrior">엔지니어링 prior</span><p data-i18n="priorVehicle">차량 질량·공력·효율·회생·보조 부하</p></div>
+              <div><span class="scope-tag prior" data-i18n="engineeringPrior">엔지니어링 prior</span><p data-i18n="priorAging">열화/SOH·석출 위험은 탐색용 지표</p></div>
+            </div>
+            <p id="cellSourceNote" class="source-note"></p>
+            <p class="limitation" data-i18n="limitation">본 앱은 OEM 디지털 트윈이나 DFN/P2D 솔버가 아닙니다. 결과는 공개 파라미터와 명시적 가정의 조합입니다.</p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>EV Battery Sim · static GitHub Pages build</span>
+      <span>Source data: JTech-CO/EV-Battery-Research · About:Energy BPX · U.S. EPA US06</span>
+    </footer>
+  </div>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
