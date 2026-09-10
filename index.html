@@ -105,12 +105,12 @@
 
       <section class="dashboard">
         <section class="metric-strip" aria-label="Current simulation state">
-          <article><span data-i18n="packVoltage">팩 전압</span><strong id="metricPackVoltage">—</strong></article>
-          <article><span data-i18n="packCurrent">팩 전류</span><strong id="metricPackCurrent">—</strong></article>
-          <article><span data-i18n="soc">SOC</span><strong id="metricSoc">—</strong></article>
-          <article><span data-i18n="cellTemp">셀 온도</span><strong id="metricTemp">—</strong></article>
-          <article><span data-i18n="soh">SOH</span><strong id="metricSoh">—</strong></article>
-          <article><span data-i18n="netEnergy">순 배터리 에너지</span><strong id="metricEnergy">—</strong></article>
+          <article><span data-i18n="packVoltage">팩 전압</span><strong id="metricPackVoltage">-</strong></article>
+          <article><span data-i18n="packCurrent">팩 전류</span><strong id="metricPackCurrent">-</strong></article>
+          <article><span data-i18n="soc">SOC</span><strong id="metricSoc">-</strong></article>
+          <article><span data-i18n="cellTemp">셀 온도</span><strong id="metricTemp">-</strong></article>
+          <article><span data-i18n="soh">SOH</span><strong id="metricSoh">-</strong></article>
+          <article><span data-i18n="netEnergy">순 배터리 에너지</span><strong id="metricEnergy">-</strong></article>
         </section>
 
         <section class="playback-card card">
@@ -128,24 +128,29 @@
             <canvas id="cellCanvas" class="cell-canvas" aria-label="Schematic battery cell visualization"></canvas>
             <p class="schematic-label" data-i18n="schematic">개략도 - 공간 PDE 해석 결과가 아님</p>
             <div class="state-table">
-              <div><span data-i18n="terminalV">단자 전압</span><strong id="terminalVoltageValue">—</strong></div>
-              <div><span data-i18n="ocv">OCV</span><strong id="ocvValue">—</strong></div>
-              <div><span data-i18n="negOcp">음극 OCP</span><strong id="negativeOcpValue">—</strong></div>
-              <div><span data-i18n="posOcp">양극 OCP</span><strong id="positiveOcpValue">—</strong></div>
-              <div><span data-i18n="xn">음극 stoichiometry</span><strong id="xnValue">—</strong></div>
-              <div><span data-i18n="xp">양극 stoichiometry</span><strong id="xpValue">—</strong></div>
+              <div><span data-i18n="terminalV">단자 전압</span><strong id="terminalVoltageValue">-</strong></div>
+              <div><span data-i18n="ocv">OCV</span><strong id="ocvValue">-</strong></div>
+              <div><span data-i18n="negOcp">음극 OCP</span><strong id="negativeOcpValue">-</strong></div>
+              <div><span data-i18n="posOcp">양극 OCP</span><strong id="positiveOcpValue">-</strong></div>
+              <div><span data-i18n="xn">음극 stoichiometry</span><strong id="xnValue">-</strong></div>
+              <div><span data-i18n="xp">양극 stoichiometry</span><strong id="xpValue">-</strong></div>
             </div>
           </section>
 
           <section class="card diagnostics-card">
             <div class="card-heading"><div><span class="eyebrow">DIAGNOSTICS</span><h2 data-i18n="risk">모델 상태 / 위험 지표</h2></div><span class="scope-tag prior" data-i18n="engineeringPrior">엔지니어링 prior</span></div>
+            <div class="pack-visual-wrap">
+              <canvas id="packCanvas" class="pack-canvas" aria-label="Interactive 3D battery pack topology"></canvas>
+              <div class="pack-visual-caption"><span data-i18n="pack3d">팩 3D 토폴로지</span><small data-i18n="pack3dHint">드래그로 회전 · 휠/핀치로 확대</small></div>
+              <p class="pack-visual-note" data-i18n="pack3dSchematic">표시 셀은 토폴로지 샘플이며 실제 셀 전부를 렌더링하지 않습니다.</p>
+            </div>
             <div class="diagnostic-list">
-              <div class="diagnostic"><span data-i18n="cRate">C-rate</span><strong id="cRateValue">—</strong><div class="meter"><i style="width:40%"></i></div></div>
-              <div class="diagnostic"><span data-i18n="irrHeat">비가역</span><strong id="irreversibleHeatValue">—</strong></div>
-              <div class="diagnostic"><span data-i18n="revHeat">가역</span><strong id="reversibleHeatValue">—</strong></div>
-              <div class="diagnostic"><span data-i18n="platingRisk">리튬 석출 위험 지수</span><strong id="platingRiskValue">—</strong></div>
-              <div class="diagnostic"><span data-i18n="agingStress">열화 스트레스 지수</span><strong id="agingStressValue">—</strong></div>
-              <div class="diagnostic"><span data-i18n="powerLimited">BMS/모델 전력 제한</span><strong id="powerLimitValue">—</strong></div>
+              <div class="diagnostic"><span data-i18n="cRate">C-rate</span><strong id="cRateValue">-</strong><div class="meter"><i id="cRateMeter" style="width:40%"></i></div></div>
+              <div class="diagnostic"><span data-i18n="irrHeat">비가역</span><strong id="irreversibleHeatValue">-</strong></div>
+              <div class="diagnostic"><span data-i18n="revHeat">가역</span><strong id="reversibleHeatValue">-</strong></div>
+              <div class="diagnostic"><span data-i18n="platingRisk">리튬 석출 위험 지수</span><strong id="platingRiskValue">-</strong></div>
+              <div class="diagnostic"><span data-i18n="agingStress">열화 스트레스 지수</span><strong id="agingStressValue">-</strong></div>
+              <div class="diagnostic"><span data-i18n="powerLimited">BMS/모델 전력 제한</span><strong id="powerLimitValue">-</strong></div>
             </div>
             <div class="model-chain" aria-label="Reduced model chain">
               <span>OCP</span><b>→</b><span>2-RC</span><b>→</b><span>Thermal</span><b>→</b><span>Pack</span><b>→</b><span>Vehicle</span>
@@ -171,8 +176,8 @@
             <div id="summaryGrid" class="summary-grid"></div>
             <div id="validationCard" class="validation-box" hidden>
               <div><span data-i18n="validation">NMC 1C 기준곡선 검증</span><small>About:Energy source curve</small></div>
-              <div><span data-i18n="rmse">전압 RMSE</span><strong id="rmseValue">—</strong></div>
-              <div><span data-i18n="maxError">최대 절대 오차</span><strong id="maxErrorValue">—</strong></div>
+              <div><span data-i18n="rmse">전압 RMSE</span><strong id="rmseValue">-</strong></div>
+              <div><span data-i18n="maxError">최대 절대 오차</span><strong id="maxErrorValue">-</strong></div>
             </div>
           </section>
 
@@ -197,6 +202,7 @@
       <span>Source data: JTech-CO/EV-Battery-Research · About:Energy BPX · U.S. EPA US06</span>
     </footer>
   </div>
-  <script type="module" src="./js/main.js"></script>
+  <script defer src="./js/runtime-data.js"></script>
+  <script defer src="./js/app.bundle.js"></script>
 </body>
 </html>

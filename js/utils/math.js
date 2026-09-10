@@ -5,7 +5,7 @@ export const mphToMps = mph => mph * 0.44704;
 export const rad = deg => deg * Math.PI / 180;
 
 export function interp1(xs, ys, x) {
-  if (!xs?.length || xs.length !== ys?.length) return NaN;
+  if (!xs || !ys || !xs.length || xs.length !== ys.length) return NaN;
   if (x <= xs[0]) return ys[0];
   if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
   let lo = 0;

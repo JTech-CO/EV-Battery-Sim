@@ -1,7 +1,10 @@
 {
   "name": "ev-battery-sim",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "scripts": {"test": "node tests/smoke.mjs"}
+  "scripts": {
+    "build:runtime": "python scripts/build_runtime.py",
+    "test": "node tests/smoke.mjs && node tests/runtime-compat.mjs"
+  }
 }

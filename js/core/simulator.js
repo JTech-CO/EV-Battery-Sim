@@ -1,4 +1,5 @@
 import { clamp, nearestIndex, rms } from '../utils/math.js';
+import { last } from '../utils/compat.js';
 import { electrochemicalState } from './electrochem.js';
 import { createEcmState, ecmResistances, terminalVoltage, advanceEcm } from './ecm.js';
 import { heatRates, advanceThermal } from './thermal.js';
@@ -30,7 +31,7 @@ export function simulate(config, datasets) {
   let temperatureK = config.thermal.initialTempC + 273.15;
   const ambientK = config.thermal.ambientTempC + 273.15;
   const ecm = createEcmState();
-  const aging = createAgingState(config.initialSoh ?? 1);
+  const aging = createAgingState(config.initialSoh === undefined ? 1 : config.initialSoh);
   let netEnergyKWh = 0;
   let dischargedEnergyKWh = 0;
   let recoveredEnergyKWh = 0;
@@ -92,8 +93,8 @@ export function simulate(config, datasets) {
     const agingStep = advanceAging(aging, { prior, currentA, capacityAh: cell.capacityAh, temperatureK, soc, dt, enabled: config.aging.enabled });
 
     out.timeS.push(profile.timeS[i]);
-    out.speedMph.push(profile.speedMph[i] ?? 0);
-    out.speedMps.push(profile.speedMps[i] ?? 0);
+    out.speedMph.push(profile.speedMph[i] === undefined ? 0 : profile.speedMph[i]);
+    out.speedMps.push(profile.speedMps[i] === undefined ? 0 : profile.speedMps[i]);
     out.accelerationMps2.push(accelerationMps2);
     out.requestedPackPowerKW.push(requestedPowerW / 1000);
     out.actualPackPowerKW.push(actualPowerW / 1000);
@@ -139,9 +140,9 @@ export function simulate(config, datasets) {
     cell,
     prior,
     packNominal,
-    finalSoc: out.soc.at(-1),
-    finalSoh: out.soh.at(-1),
-    finalTemperatureC: out.temperatureC.at(-1),
+    finalSoc: last(out.soc, 0),
+    finalSoh: last(out.soh, 1),
+    finalTemperatureC: last(out.temperatureC, config.thermal.initialTempC),
     maxTemperatureC: Math.max(...out.temperatureC),
     minCellVoltageV: Math.min(...out.cellVoltageV),
     maxCellVoltageV: Math.max(...out.cellVoltageV),

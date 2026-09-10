@@ -1,3 +1,5 @@
+import { readStorage, writeStorage, dispatchAppEvent } from '../utils/compat.js';
+
 const dictionaries = {
   ko: {
     appSubtitle: '공개 파라미터 기반 셀·팩·차량 연성 시뮬레이터',
@@ -41,7 +43,6 @@ const dictionaries = {
     reset: '기본값 복원',
     exportCsv: '결과 CSV',
     exportJson: '설정 JSON',
-    overview: '실시간 상태',
     packVoltage: '팩 전압',
     packCurrent: '팩 전류',
     soc: 'SOC',
@@ -49,10 +50,7 @@ const dictionaries = {
     soh: 'SOH',
     netEnergy: '순 배터리 에너지',
     electrochem: '전기화학 상태',
-    schematic: '개략도 - 공간 PDE 해석 결과가 아님',
-    negative: '음극',
-    separator: '분리막',
-    positive: '양극',
+    schematic: '3D 레이어 개략도 - 공간 PDE 해석 결과가 아님',
     terminalV: '단자 전압',
     ocv: 'OCV',
     negOcp: '음극 OCP',
@@ -60,7 +58,6 @@ const dictionaries = {
     xn: '음극 stoichiometry',
     xp: '양극 stoichiometry',
     cRate: 'C-rate',
-    heat: '셀 발열',
     irrHeat: '비가역',
     revHeat: '가역',
     risk: '모델 상태 / 위험 지표',
@@ -69,6 +66,9 @@ const dictionaries = {
     powerLimited: 'BMS/모델 전력 제한',
     no: '없음',
     yes: '활성',
+    pack3d: '팩 3D 토폴로지',
+    pack3dHint: '드래그로 회전 · 휠/핀치로 확대',
+    pack3dSchematic: '표시 셀은 토폴로지 샘플이며 실제 셀 전부를 렌더링하지 않습니다.',
     charts: '시계열',
     speed: '차량 속도',
     packPower: '팩 전력',
@@ -95,7 +95,6 @@ const dictionaries = {
     limitation: '본 앱은 OEM 디지털 트윈이나 DFN/P2D 솔버가 아닙니다. 결과는 공개 파라미터와 명시적 가정의 조합입니다.',
     playback: '재생',
     pause: '일시정지',
-    time: '시간',
     summary: '결과 요약',
     nominalPack: '정격 팩',
     cells: '셀',
@@ -105,7 +104,9 @@ const dictionaries = {
     maxCRate: '최대 C-rate',
     recovered: '회수 에너지',
     limitsActive: '제한 활성 비율',
-    loadError: '데이터를 불러오지 못했습니다. GitHub Pages 또는 로컬 HTTP 서버에서 실행하십시오.'
+    runtimeMode: '호환 런타임',
+    runtimeNote: '외부 CDN, ES module fetch 없이 정적 데이터 번들로 실행',
+    loadError: '앱 초기화에 실패했습니다. 브라우저 콘솔의 오류와 파일 배포 경로를 확인하십시오.'
   },
   en: {
     appSubtitle: 'Coupled cell, pack and vehicle simulator using public parameters',
@@ -119,24 +120,34 @@ const dictionaries = {
     power: 'Pack power', currentC: 'Cell C-rate', duration: 'Duration', ambient: 'Ambient temperature', initialTemp: 'Initial cell temperature', cooling: 'Heat transfer coefficient h',
     agingToggle: 'Apply exploratory aging prior', agingWarning: 'SOH change is a screening prior, not a dataset-calibrated lifetime prediction.',
     mass: 'Vehicle mass', cd: 'Drag coefficient Cd', area: 'Frontal area', crr: 'Rolling resistance Crr', driveEff: 'Drive efficiency', regenEff: 'Regen efficiency', aux: 'Auxiliary load', grade: 'Road grade', maxTraction: 'Max traction power', maxRegen: 'Max regen power',
-    run: 'Run simulation', reset: 'Restore defaults', exportCsv: 'Result CSV', exportJson: 'Config JSON', overview: 'Current state', packVoltage: 'Pack voltage', packCurrent: 'Pack current', soc: 'SOC', cellTemp: 'Cell temperature', soh: 'SOH', netEnergy: 'Net battery energy',
-    electrochem: 'Electrochemical state', schematic: 'Schematic - not a spatial PDE solution', negative: 'Negative', separator: 'Separator', positive: 'Positive', terminalV: 'Terminal voltage', ocv: 'OCV', negOcp: 'Negative OCP', posOcp: 'Positive OCP', xn: 'Negative stoichiometry', xp: 'Positive stoichiometry', cRate: 'C-rate', heat: 'Cell heat', irrHeat: 'Irreversible', revHeat: 'Reversible',
-    risk: 'Model state / risk indicators', platingRisk: 'Lithium plating risk index', agingStress: 'Aging stress index', powerLimited: 'BMS/model power limit', no: 'None', yes: 'Active', charts: 'Time series', speed: 'Vehicle speed', packPower: 'Pack power', voltage: 'Cell voltage', socChart: 'SOC', tempChart: 'Cell temperature', heatChart: 'Cell heat rate', requested: 'Requested', actual: 'Actual', terminal: 'Terminal', generated: 'Total generated', coolingHeat: 'Cooling removal',
-    validation: 'NMC 1C reference validation', rmse: 'Voltage RMSE', maxError: 'Max absolute error', modelScope: 'Model scope & provenance', sourceBased: 'Source-based', engineeringPrior: 'Engineering prior', sourceOcp: 'OCP, stoichiometry, cell heat capacity and voltage limits', priorEcm: '2-RC polarization, temperature scaling and C-rate limits', sourceVehicle: 'EPA US06 speed profile', priorVehicle: 'Vehicle mass, aero, efficiency, regen and auxiliary load', priorAging: 'Aging/SOH and plating risk are exploratory indicators', limitation: 'This app is not an OEM digital twin or a DFN/P2D solver. Results combine public parameters with explicit assumptions.', playback: 'Play', pause: 'Pause', time: 'Time', summary: 'Result summary', nominalPack: 'Nominal pack', cells: 'cells', maxTemp: 'Max temperature', peakPower: 'Peak discharge', peakRegen: 'Peak regen', maxCRate: 'Max C-rate', recovered: 'Recovered energy', limitsActive: 'Limit-active fraction', loadError: 'Failed to load data. Run from GitHub Pages or a local HTTP server.'
+    run: 'Run simulation', reset: 'Restore defaults', exportCsv: 'Result CSV', exportJson: 'Config JSON', packVoltage: 'Pack voltage', packCurrent: 'Pack current', soc: 'SOC', cellTemp: 'Cell temperature', soh: 'SOH', netEnergy: 'Net battery energy',
+    electrochem: 'Electrochemical state', schematic: '3D-layer schematic - not a spatial PDE solution', terminalV: 'Terminal voltage', ocv: 'OCV', negOcp: 'Negative OCP', posOcp: 'Positive OCP', xn: 'Negative stoichiometry', xp: 'Positive stoichiometry', cRate: 'C-rate', irrHeat: 'Irreversible', revHeat: 'Reversible',
+    risk: 'Model state / risk indicators', platingRisk: 'Lithium plating risk index', agingStress: 'Aging stress index', powerLimited: 'BMS/model power limit', no: 'None', yes: 'Active',
+    pack3d: '3D pack topology', pack3dHint: 'Drag to rotate · wheel/pinch to zoom', pack3dSchematic: 'Rendered cells are a topology sample, not every physical cell in the pack.',
+    charts: 'Time series', speed: 'Vehicle speed', packPower: 'Pack power', voltage: 'Cell voltage', socChart: 'SOC', tempChart: 'Cell temperature', heatChart: 'Cell heat rate', requested: 'Requested', actual: 'Actual', terminal: 'Terminal', generated: 'Total generated', coolingHeat: 'Cooling removal',
+    validation: 'NMC 1C reference validation', rmse: 'Voltage RMSE', maxError: 'Max absolute error', modelScope: 'Model scope & provenance', sourceBased: 'Source-based', engineeringPrior: 'Engineering prior', sourceOcp: 'OCP, stoichiometry, cell heat capacity and voltage limits', priorEcm: '2-RC polarization, temperature scaling and C-rate limits', sourceVehicle: 'EPA US06 speed profile', priorVehicle: 'Vehicle mass, aero, efficiency, regen and auxiliary load', priorAging: 'Aging/SOH and plating risk are exploratory indicators', limitation: 'This app is not an OEM digital twin or a DFN/P2D solver. Results combine public parameters with explicit assumptions.', playback: 'Play', pause: 'Pause', summary: 'Result summary', nominalPack: 'Nominal pack', cells: 'cells', maxTemp: 'Max temperature', peakPower: 'Peak discharge', peakRegen: 'Peak regen', maxCRate: 'Max C-rate', recovered: 'Recovered energy', limitsActive: 'Limit-active fraction', runtimeMode: 'Compatibility runtime', runtimeNote: 'Runs from a static data bundle without CDN or ES-module fetch dependencies.', loadError: 'App initialization failed. Check the browser console and deployed file paths.'
   }
 };
 
-let language = localStorage.getItem('evbs-language') || 'ko';
-export const getLanguage = () => language;
-export const t = key => dictionaries[language]?.[key] ?? dictionaries.en[key] ?? key;
+let language = readStorage('evbs-language', 'ko');
+if (language !== 'en' && language !== 'ko') language = 'ko';
+
+export const getLanguage = function () { return language; };
+export const t = function (key) {
+  const current = dictionaries[language] || dictionaries.en;
+  return current[key] !== undefined ? current[key] : (dictionaries.en[key] !== undefined ? dictionaries.en[key] : key);
+};
+
 export function setLanguage(next) {
   language = next === 'en' ? 'en' : 'ko';
-  localStorage.setItem('evbs-language', language);
+  writeStorage('evbs-language', language);
   document.documentElement.lang = language;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
+  const nodes = document.querySelectorAll('[data-i18n]');
+  for (let i = 0; i < nodes.length; i += 1) {
+    const el = nodes[i];
     const value = t(el.dataset.i18n);
     if (el.tagName === 'INPUT' && el.type === 'button') el.value = value;
     else el.textContent = value;
-  });
-  document.dispatchEvent(new CustomEvent('evbs:language', { detail: language }));
+  }
+  dispatchAppEvent('evbs:language', language);
 }

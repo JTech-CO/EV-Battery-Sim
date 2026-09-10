@@ -38,3 +38,6 @@ The app tracks absolute Ah throughput and EFC. Optional SOH loss and plating/agi
 
 ## 7. Validation path
 For the NMC preset, the public 1C source curve is sampled at its reference times and compared against the reduced model. RMSE and maximum absolute voltage error are reported rather than hidden. This is an in-family reference comparison, not an independent holdout.
+
+## 8. Meaning of the 3D views
+The cell cross-section and pack view use canvas geometry and perspective projection to show depth, rotation, cell arrangement, SOC, temperature, and power state. These 3D shapes are not spatial DFN solutions, finite-element thermal fields, CT reconstructions, or actual OEM pack geometry. They are schematic views for interpreting the reduced simulator state.
